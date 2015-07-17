@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Welcome Back {{ user.employee_id }} - This is your profile page</h1>
+    <p>Employee_id {{ user.employee_id }}</p>
+    <p>Firstname {{ user.firstname }}</p>
+	<p>Lastname {{ user.lastname }}</p>
+	<p>Phone Number {{user.mobile_number}}</p>
+    
+
+{% endblock %}
