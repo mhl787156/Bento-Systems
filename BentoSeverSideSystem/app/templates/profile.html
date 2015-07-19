@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Welcome Back {{ user.employee_id }} - This is your profile page</h1>
-    <p>Employee_id {{ user.employee_id }}</p>
-    <p>Firstname {{ user.firstname }}</p>
-	<p>Lastname {{ user.lastname }}</p>
-	<p>Phone Number {{user.mobile_number}}</p>
+    <h1>{{user.firstname}}'s Profile Page</h1>
+    <p>Your Employee_ID is this: "{{user.employee_id}}" : Use this to Log into the system</p>
+    <p>Firstname: {{user.firstname}}</p>
+	<p>Lastname: {{user.lastname}}</p>
+	<p>Phone Number: {{user.mobile_number}}</p>
+	<p>Email Address: {{user.email}}</p>
+	
+	<li><a href="{{ url_for('editProfile') }}">Edit Profile</a></li>
     
-
 {% endblock %}

@@ -4,6 +4,7 @@ from app import app, db, lm, oid
 from .forms import SignupForm,SigninForm
 from .models import User
 
+
 @app.route('/')
 @app.route('/index')
 #@login_required
@@ -23,7 +24,6 @@ def index():
 
 
 #Login/Password login methods
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
   form = SignupForm()
@@ -43,21 +43,12 @@ def signup():
       db.session.commit()
       
       session['employee_id'] = newUser.employee_id
-      return redirect(url_for('aftersignup'))
+      return redirect(url_for('profile'))
    
   elif request.method == 'GET':
     return render_template('signup.html', title = 'Signup' ,form=form)
 
-@app.route('/aftersignup')
-def afterSignup():
-    if 'employee_id' not in session:
-      return redirect(url_for('signin'))
-  
-    user = User.query.filter_by(employee_id = session['employee_id']).first()
 
-    if user is None:
-      return redirect(url_for('signin'))
-    else: render_template('afterSignup.html',user=user,title = 'Details')
   
 @app.route('/profile')
 def profile():
@@ -70,6 +61,14 @@ def profile():
       return redirect(url_for('signin'))
     else:
       return render_template('profile.html', user = user , title=user.employee_id + "'s Profile")
+
+
+      
+@app.route('/editProfile')
+def editProfile():
+    #TODO
+    return render_template('editProfile.html', title = 'Edit Profile', form = None)
+
 
 
 @app.route('/signin', methods=['GET', 'POST'])
@@ -99,68 +98,5 @@ def signout():
     
   return redirect(url_for('signin'))
 
-
-
-
-
-"""
-OpenID Login Methods
-
-@app.route('/login', methods=['GET', 'POST'])
-@oid.loginhandler
-def login():
-
-    if g.user is not None and g.user.is_authenticated():
-        return redirect(url_for('index'))
-
-    form = LoginForm()
-
-    if form.validate_on_submit():
-        session['remember_me'] = form.remember_me.data
-        return oid.try_login(form.openid.data, ask_for=['nickname', 'email'])
-
-    return render_template('login.html', 
-                           title='Sign In',
-                           form=form,
-                           providers=app.config['OPENID_PROVIDERS'])
-
-
-@lm.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-
-
-@oid.after_login
-def after_login(resp):
-
-    user = User.query.filter_by(email=resp.email).first()
-
-    if user is None:
-        nickname = resp.nickname
-        if nickname is None or nickname == "":
-            nickname = resp.email.split('@')[0]
-        user = User(nickname=nickname, email=resp.email)
-        db.session.add(user)
-        db.session.commit()
-
-    remember_me = False
-
-    if 'remember_me' in session:
-        remember_me = session['remember_me']
-        session.pop('remember_me', None)
-
-    login_user(user, remember = remember_me)
-    return redirect(request.args.get('next') or url_for('index'))
-
-
-@app.before_request
-def before_request():
-    g.user = current_user
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-"""
 
 

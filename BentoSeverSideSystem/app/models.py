@@ -2,6 +2,8 @@ from app import db
 from datetime import datetime
 from werkzeug import generate_password_hash, check_password_hash
 
+counter = 0
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     employee_id = db.Column(db.String(64), index=True, unique=True)
@@ -27,7 +29,9 @@ class User(db.Model):
         self.password = password
 
     def create_employee_id(self,firstname,lastname):
-      	self.employee_id = firstname.lower()+"."+lastname.lower()
+        counter += 1
+      	self.employee_id = firstname.lower()+"."+lastname.lower() + counter
+
      
     def set_password(self, password):
         self.pwdhash = generate_password_hash(password)
