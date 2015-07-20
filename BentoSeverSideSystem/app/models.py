@@ -1,8 +1,10 @@
 from app import db
 from datetime import datetime
 from werkzeug import generate_password_hash, check_password_hash
+from random import randint
 
 counter = 0
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,8 +31,7 @@ class User(db.Model):
         self.password = password
 
     def create_employee_id(self,firstname,lastname):
-        counter += 1
-      	self.employee_id = firstname.lower()+"."+lastname.lower() + counter
+      	self.employee_id = firstname.lower()+"."+lastname.lower() + str(randint(0,100))
 
      
     def set_password(self, password):

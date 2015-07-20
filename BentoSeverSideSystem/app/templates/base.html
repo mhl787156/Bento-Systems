@@ -14,12 +14,12 @@
         <nav>
           <ul>
           <li><a href="{{ url_for('index') }}">Home</a></li>
-          {% if 'employee_id' in session %}
+          {% if g.user.is_authenticated() %}
           <li><a href="{{ url_for('profile') }}">Profile</a></li>
           <li><a href="{{ url_for('signout') }}">Sign Out</a></li>
           {% else %}
           <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
-          <li><a href="{{ url_for('signin') }}">Sign In</a></li>
+          <li><a href="{{ url_for('login') }}">Sign In</a></li>
            {% endif %}
           </ul>
         </nav>

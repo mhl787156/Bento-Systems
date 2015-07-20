@@ -5,23 +5,51 @@ from .forms import SignupForm,SigninForm
 from .models import User
 
 
+"""---------------  MENU METHODS -----------------------------------"""
+
+
+
+
+
+
+
+"""-------------------ORDERING METHODS ---------------------------------"""
+
+
+
+
+
+"""--------------- PERSONAL PAGES METHODS ------------------------------"""
+
+
 @app.route('/')
 @app.route('/index')
-#@login_required
+@login_required
 def index():
-    if 'employee_id' not in session:
-      return redirect(url_for('signin'))
-    #If statement on clearance, 
-    
-       
-    user = User.query.filter_by(employee_id = session['employee_id']).first()
-    if user is None:
-      return redirect(url_for('signin'))
-    else:
-      return render_template('index.html',
+  user = g.user
+  return render_template('index.html',
                            title='Index',
                            user=user)
 
+@app.route('/profile')
+@login_required
+def profile():
+    
+    user = g.user    
+
+    return render_template('profile.html', user = user , title=user.employee_id + "'s Profile")
+
+
+      
+@app.route('/editProfile')
+@login_required
+def editProfile():
+    #TODO
+    return render_template('editProfile.html', title = 'Edit Profile', form = None)
+    
+    
+
+"""---------------------LOGIN/PASSWORD METHODS--------------------------"""
 
 #Login/Password login methods
 @app.route('/signup', methods=['GET', 'POST'])
@@ -43,60 +71,56 @@ def signup():
       db.session.commit()
       
       session['employee_id'] = newUser.employee_id
-      return redirect(url_for('profile'))
+      flash("This is Your User ID: %s\nYou Must Remember this and use it to Log In from now on")
+      return redirect(url_for('login'))
    
   elif request.method == 'GET':
     return render_template('signup.html', title = 'Signup' ,form=form)
 
+@lm.user_loader
+def load_user(id):
+  return User.query.get(int(id))
 
-  
-@app.route('/profile')
-def profile():
-    if 'employee_id' not in session:
-      return redirect(url_for('signin'))
-    
-    user = User.query.filter_by(employee_id = session['employee_id']).first()
+@app.before_request
+def before_request():
+  g.user = current_user 
+                 
 
-    if user is None:
-      return redirect(url_for('signin'))
-    else:
-      return render_template('profile.html', user = user , title=user.employee_id + "'s Profile")
+@app.route('/login', methods=['GET', 'POST'])
+def login():
 
+  if g.user is not None and g.user.is_authenticated():
+    return redirect(url_for('profile'))  
 
-      
-@app.route('/editProfile')
-def editProfile():
-    #TODO
-    return render_template('editProfile.html', title = 'Edit Profile', form = None)
-
-
-
-@app.route('/signin', methods=['GET', 'POST'])
-def signin():
   form = SigninForm()
    
-  if request.method == 'POST':
-    if form.validate() == False:
-      return render_template('signin.html', title = 'signin',form=form)
+  if form.validate_on_submit():
+
+    user = User.query.filter_by(employee_id = form.employee_id.data.lower()).first()
+    
+    #Successful Login 
+    if user is not None and user.check_password(form.password.data):
+      session ['employee_id'] = form.employee_id.data
+      login_user(user)
+      return redirect(request.args.get('next') or url_for('profile'))
+    
+    #Unsuccessful Login
     else:
-      session['employee_id'] = form.employee_id.data
-      return redirect(url_for('profile'))
-                 
-  elif request.method == 'GET':
-    return render_template('signin.html',title = 'signin', form=form)
+      form.employee_id.errors.append("Invalid ID or password")
+
+  return render_template('login.html', title = 'login',form=form)
 
 
-
+@app.route('/removeUser')
+@login_required
+def removeUser():
+  users = g.user 
+  db.session.delete(user)
+  db.session.commit()
+  return redirect(url_for('signout'))
 
 @app.route('/signout')
+@login_required
 def signout():
- 
-  if 'employee_id' not in session:
-        redirect(url_for('signin'))
-  
-  session.pop('employee_id', None)
-    
-  return redirect(url_for('signin'))
-
-
-
+  logout_user()
+  return redirect(url_for('login'))
