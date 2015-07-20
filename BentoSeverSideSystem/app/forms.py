@@ -39,7 +39,6 @@ class editProfile(Form):
     if not Form.validate(self):
        return False
     
-    
     #If new emil is not None, then we are ok
     if self.email.data.lower() != user.email and User.query.filter_by(email = self.email.data.lower()) is not None:
        self.email.errors.append("Duplicated email")

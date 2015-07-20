@@ -1,11 +1,20 @@
 #!flask/bin/python
-from SectionTests import loginTests
 
-def runTests():
-    loginTests()
+import unittest
+import test_login
 
 
-runTests()
+def allSuites():
+  suites = [
+             loginTests.suite()
+           ]
+
+  return unittest.TestSuite(suites)
+
+
+
+
+
 
 
 
