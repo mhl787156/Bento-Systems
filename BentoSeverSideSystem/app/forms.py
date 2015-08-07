@@ -7,8 +7,8 @@ class SignupForm(Form):
   firstname = TextField("First Name",  [validators.Required("Please enter a First Name.")])
   lastname = TextField("Last Name",  [validators.Required("Please enter a Last Name.")])
   mobile_number = TextField("Mobile Phone Number", [validators.Required("Please enter a phone number")])
-  clearance = IntegerField("Clearance" , [validators.Required("Please determin your system clearance."), validators.NumberRange(min = 0, max = 5,message = "Make sure we have a valid clearance")])
-  email = TextField("Email",  [validators.Required("Please enter your email address."), validators.Email("Please enter your email address.")])
+  clearance = IntegerField("Clearance" , [validators.Required("Please determine your system clearance."), validators.NumberRange(min = 0, max = 5,message = "Make sure we have a valid clearance")])
+  email = TextField("Email",  [validators.Required("Please enter your email address."), validators.Email("Please enter a valid email address.")])
   password = PasswordField('Password', [validators.Required("Please enter a password.")])
   submit = SubmitField("Add to Database")
  
@@ -17,6 +17,7 @@ class SignupForm(Form):
  
   def validate(self):
     if not Form.validate(self):
+      print "Form Not Validated!!!!" + str(Form.validate(self))
       return False
     
     #check email uniquness

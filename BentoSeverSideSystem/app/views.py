@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
-from app import app, db, lm, oid
+from app import app, db, lm
 from .forms import SignupForm,SigninForm
 from .models import User
 
@@ -58,8 +58,10 @@ def signup():
    
   if request.method == 'POST':
     if form.validate() == False:
+      print 'NOTVALIDATED!!!!!!!!!!!!!!!!'
       return render_template('signup.html', title = 'Signup',form=form)
     else:  
+      print 'VALIDATEDD!!!!!!!!!!!!!!!!'
       newUser = User(form.firstname.data,
                      form.lastname.data,
                      form.mobile_number.data,
@@ -69,9 +71,10 @@ def signup():
 
       db.session.add(newUser)
       db.session.commit()
-      
+            
       session['employee_id'] = newUser.employee_id
-      flash("This is Your User ID: %s\nYou Must Remember this and use it to Log In from now on")
+      flash('Successful Signup')
+      flash("This is Your User ID: %s \n You Must Remember this and use it to Log In from now on",employee_id)
       return redirect(url_for('login'))
    
   elif request.method == 'GET':
@@ -102,10 +105,12 @@ def login():
     if user is not None and user.check_password(form.password.data):
       session ['employee_id'] = form.employee_id.data
       login_user(user)
+      flash("Successful Login")
       return redirect(request.args.get('next') or url_for('profile'))
     
     #Unsuccessful Login
     else:
+      flash("Unsuccessful Login")
       form.employee_id.errors.append("Invalid ID or password")
 
   return render_template('login.html', title = 'login',form=form)
@@ -117,10 +122,12 @@ def removeUser():
   users = g.user 
   db.session.delete(user)
   db.session.commit()
+  flash("Removed Successfully")
   return redirect(url_for('signout'))
 
 @app.route('/signout')
 @login_required
 def signout():
   logout_user()
+  flash("You were logged out")
   return redirect(url_for('login'))

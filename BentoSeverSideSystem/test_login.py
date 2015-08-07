@@ -2,7 +2,7 @@ import os
 import unittest
 
 
-from .config import basedir
+from config import basedir
 from app import app,db
 from app.models import User
 from app.forms import SignupForm, SigninForm
@@ -20,36 +20,42 @@ class LoginTestCases(unittest.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir,'test.db')
     self.app = app.test_client()
     db.create_all()
-
+    
+    """
     user = User('test1','test2','07980639802',5,'test@test.com','123')
     db.session.add(user)
     db.session.commit()
+    """
 
   def tearDown(self):
     db.session.remove()
     db.drop_all()
 
   """------------ Helper Functions -----------"""
-  def login(self,firstname,lastname,mobile_number,clearance,email,password):
-    return self.app.post('/login', data = dict(
+  def signup(self,firstname,lastname,mobile_number,clearance,email,password):
+    return self.app.post('/signup', data = dict(
       firstname = firstname,
       lastname=lastname,
       mobile_number=mobile_number,
       clearance=clearance,
       email=email,
-      password=password
+      password=password,
       ) , follow_redirects=True)
+
+  def removeUser():
+    return self.app.get('/removeUser',follow_redirects=True)
 
   def logout(self):
     return self.app.get('/signout',follow_redirects=True)
 
  
   """------------ SignUpForm Tests  -----------"""
-  def test_validate1(self):
-    rv = self.login('test1','test2','07980639802',5,'asd@asd','123')
-    assert 'Successful Login' in rv.data
-    rv = self.logout
-    assert 'You were logged out' in rv.data
+  def test_signup_and_remove(self):
+    rv = self.signup('test16','test82','07980639802',5,'asd1@asd.com','123')
+    print rv.data
+    self.assertTrue('Successful Signup' in rv.data,"Signup was not successful")
+    rv = self.removeUser()
+    assert 'Removed Successfully' in rv.data
 
 
 
@@ -82,4 +88,4 @@ class LoginTestCases(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  logintest.main()
+  unittest.main()

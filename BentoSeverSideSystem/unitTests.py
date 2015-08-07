@@ -1,19 +1,16 @@
 #!flask/bin/python
 
 import unittest
-import test_login
 
+from xmlTestrunner import XMLTestRunner
 
-def allSuites():
-  suites = [
-             loginTests.suite()
-           ]
+loader = unittest.TestLoader()
 
-  return unittest.TestSuite(suites)
+tests = loader.discover('SectionTests',pattern = 'test*.py')
 
+runner = XMLTestRunner()
 
-
-
+runner.run(tests)
 
 
 
