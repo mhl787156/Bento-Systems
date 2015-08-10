@@ -3,6 +3,42 @@ from flask import g
 from flask.ext.wtf import Form
 from wtforms import SelectField , TextField, SubmitField, ValidationError, PasswordField , validators , IntegerField
 
+
+"""/////////////////////////////////////////////////////////
+                    Menu Forms
+/////////////////////////////////////////////////////////"""
+class CreateMenuForm(Form):
+  menuName = TextField("Menu Name" , [validators.Required("Please enter a Menu Name.")])
+  
+  def __init__(self,*args,**kwargs):
+    Form.__init__(self,*args,**kwargs)
+
+  def validate(self):
+    if not Form.validate(self):
+      return False
+
+    if User.querty.filter_by(menu_name = self.menuName.data.lower()).first() is not None:
+      self.menuName.errors.append('Duplicated menu name')
+      return False
+    return True
+
+
+class AddMenuSectionForm(Form):
+  #menu = drop down of all available menus
+  sectionName = TextField("Section Name" ,[validators.Required("Please enter a Section Name")])
+  
+  def __init__(self,*args,**kwargs):
+    Form.__init__(self,*args,**kwargs)
+
+  def validate(self):
+    if not Form.validate(self):
+      return False
+    return True
+
+"""/////////////////////////////////////////////////////////
+                    Profile Forms
+/////////////////////////////////////////////////////////"""
+
 class SignupForm(Form):
   firstname = TextField("First Name",  [validators.Required("Please enter a First Name.")])
   lastname = TextField("Last Name",  [validators.Required("Please enter a Last Name.")])

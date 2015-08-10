@@ -1,16 +1,72 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
-from .forms import SignupForm,SigninForm
+from .forms import SignupForm,SigninForm,CreateMenuForm,AddMenuSectionForm
+m
 from .models import User
 
 
 """---------------  MENU METHODS -----------------------------------"""
 
+@app.route('/createMenu',method=['GET','POST'])
+@login_required
+def createMenu():
+  form = CreateMenuForm()
+
+  if request.method == 'GET':
+    if form.validate() == False:
+      #TODO - return the create menu form html page
+
+  newMenu = Menu(form.menuName.data)
+
+  db.session.add(newMenu)
+  db.session.commit()
+  
+  #Redirect to menu display page so user can view menu
+  return redirect(url_for('displayMenu'))
+
+  if request.method == 'POST':
+    #TODO - return the Create Menu Form html page
+
+
+@app.route('/addMenuSection',method=['GET','POST'])
+@login_required
+def addMenuSection():
+  form = AddMenuSectionForm()
+
+  if request.method == 'GET':
+    if form.validate()==False:
+      #TODO
+
+  newMenuSection = MenuSection(form.sectionName.data)
+
+  db.session.add(newMenu)
+  db.session.commit()
+
+  return redirect(url_for('displayMenu'))
+
+  elif request.method == 'POST':
+    #TODO
+
+
+@app.route('/addMenuItem',method=['GET','POST'])
+@login_required
+def addMenuItem():
+  #TODO
 
 
 
+@app.route('/editMenuItem',method=['GET','POST'])
+@login_required
+def editMenuItem():
+  #TODO
 
+
+
+@app.route('/displayMenu')
+@login_required
+def displayMenu():
+  #TODO
 
 
 """-------------------ORDERING METHODS ---------------------------------"""
@@ -58,10 +114,8 @@ def signup():
    
   if request.method == 'POST':
     if form.validate() == False:
-      print 'NOTVALIDATED!!!!!!!!!!!!!!!!'
       return render_template('signup.html', title = 'Signup',form=form)
     else:  
-      print 'VALIDATEDD!!!!!!!!!!!!!!!!'
       newUser = User(form.firstname.data,
                      form.lastname.data,
                      form.mobile_number.data,
@@ -116,6 +170,8 @@ def login():
   return render_template('login.html', title = 'login',form=form)
 
 
+
+
 @app.route('/removeUser')
 @login_required
 def removeUser():
@@ -125,9 +181,16 @@ def removeUser():
   flash("Removed Successfully")
   return redirect(url_for('signout'))
 
+
+
+
 @app.route('/signout')
 @login_required
 def signout():
   logout_user()
   flash("You were logged out")
   return redirect(url_for('login'))
+
+
+
+

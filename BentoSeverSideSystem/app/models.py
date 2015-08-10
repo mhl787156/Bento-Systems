@@ -134,8 +134,7 @@ class MenuSection(db.item):
     def get_total_number_of_items(self):
       return self.total_number_of_items
       
-    
-
+  
 
 class MenuItem(db.Model):  
     #Items
@@ -272,7 +271,6 @@ class OrderItem(db.Model):
       self.item_number = itemNumber
       self.quantity = quantity
       self.set_subPrice()#TODO
-
 
     def get_itemNumber_menuItem(self):  
     #TODO
