@@ -28,7 +28,8 @@ class User(db.Model):
         self.date_joined = datetime.now()
         self.email = email.lower()
         self.set_password(password)
-        self.password = password
+
+        self.password = password # Remember to remove on use
 
     def create_employee_id(self,firstname,lastname):
       	self.employee_id = firstname.lower()+"."+lastname.lower() + str(randint(0,100))
@@ -59,6 +60,7 @@ class User(db.Model):
 """//////////////////////////////////////////////////////////////
                         MENU DATABASE ITEMS
 /////////////////////////////////////////////////////////////"""
+"""
 
 class Menu(db.Model):
     #Items
@@ -104,11 +106,11 @@ class Menu(db.Model):
 
     def get_last_date_changed(self):
       return last_date_changed
-`
+
     def __repr__(self):
       return '< Menu: %r , last_date_changed: %r , numSections: %r , numItems: %r>' % (self.menu_name,self.last_date_changed,self.total_number_of_sections,self.total_number_of_items)
     
-class MenuSection(db.item):
+class MenuSection(db.Model):
     #Items
     id = db.Column(db.Integer , primary_key=True)
     section_name = db.Column(db.String(64),unique=True,index=True)
@@ -169,7 +171,7 @@ class MenuItem(db.Model):
 
     def set_price(self,price):
       self.price = price
-    def get_price(self)
+    def get_price(self):
       return self.price
 
     def set_short_description(self,sd):
@@ -202,18 +204,21 @@ class MenuItem(db.Model):
       return '< ItemName: %r , Price %r >' % (self.item_name , self.price)
 
 #Might be right thing to do??
+"""
 
-menuItem_orderItem = db.Table('menuItem_orderItem',
-    db.Column('orderItem_id',db.Integer,db.ForeignKey('orderItem.id'))
-    db.Column('menuItem_id',db.Integer,db.ForeignKey('menuItem.id'))
-)            
+"""
+menuItem_orderItem = db.Table('menuItem_orderItem',[
+    db.Column('orderItem_id',db.Integer,db.ForeignKey('orderItem.id')),
+    db.Column('menuItem_id',db.Integer,db.ForeignKey('menuItem.id'))]
+)  
+"""
 
 
 
 """//////////////////////////////////////////////////////////////
                     ORDER DATABASE ITEMS
 /////////////////////////////////////////////////////////////"""
-
+"""
 
 class Order(db.Model):
     #Fields
@@ -237,6 +242,7 @@ class Order(db.Model):
       
     def add_item(self,itemID,quantity):
       #TODO
+      return
 
     def get_current_price(self):
       return self.current_price
@@ -249,12 +255,15 @@ class Order(db.Model):
 
     def update_number_of_items(self):
       #TODO
+      return
 
     def pay(self):
       #TODO
+      return
 
     def __repr__(self):
       #TODO
+      return
 
 
 class OrderItem(db.Model):
@@ -271,9 +280,11 @@ class OrderItem(db.Model):
       self.item_number = itemNumber
       self.quantity = quantity
       self.set_subPrice()#TODO
+      return
 
     def get_itemNumber_menuItem(self):  
-    #TODO
+      #TODO
+      return
   
     def update_quantity(self,additionalUnits):
       self.quantity = self.quantity + additionalUnits
@@ -305,9 +316,11 @@ class OrderCounter(db.Model):
 
     def get_current_number_of_orders(self):
       #TODO
+      return
 
     def set_current_number_of_orders(self):
       #TODO
+      return
     
     def __repr__(self):
       return '< Ongoing orders: %r >' % (current_number_of_orders)
@@ -317,11 +330,11 @@ class OrderCounter(db.Model):
 class OrderLogger(db.Model):
     #Fields
     id = db.Column(db.Integer , primary_key=True)
-    date = db.Column(db.datetime)
+    date = db.Column(db.DateTime)
     
     #Relationship Fields
 
-
+"""
 
 
 

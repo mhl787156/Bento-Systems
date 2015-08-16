@@ -2,13 +2,14 @@
 
 import unittest
 
+from xmlTestrunner import XMLTestRunner
 
 loader = unittest.TestLoader()
 
-tests = loader.discover('.')
+tests = loader.discover()
 #tests = loader.discover('SectionTests',pattern = 'test*.py')
 
-runner = unittest.TextTestRunner()
+runner = XMLTestRunner()
 
 runner.run(tests)
 

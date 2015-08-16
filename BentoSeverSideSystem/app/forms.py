@@ -45,7 +45,7 @@ class SignupForm(Form):
   mobile_number = TextField("Mobile Phone Number", [validators.Required("Please enter a phone number")])
   clearance = IntegerField("Clearance" , [validators.Required("Please determine your system clearance."), validators.NumberRange(min = 0, max = 5,message = "Make sure we have a valid clearance")])
   email = TextField("Email",  [validators.Required("Please enter your email address."), validators.Email("Please enter a valid email address.")])
-  password = PasswordField('Password', [validators.Required("Please enter a password.")])
+  password = PasswordField('Password')
   submit = SubmitField("Add to Database")
  
   def __init__(self, *args, **kwargs):
@@ -53,9 +53,7 @@ class SignupForm(Form):
  
   def validate(self):
     if not Form.validate(self):
-      print "Form Not Validated!!!!" + str(Form.validate(self))
-      return False
-    
+      return False 
     #check email uniquness
     if User.query.filter_by(email = self.email.data.lower()).first() is not None:
       self.email.errors.append("Duplicated email")

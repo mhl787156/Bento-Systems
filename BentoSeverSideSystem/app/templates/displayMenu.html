@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1> INDEX PAGE</h1>
+    
+    <h2> Menu Editing </h2>
+
+    <li><a href="{{ url_for('createMenu') }}">Create a New Menu</a></li>
+    <li><a href="{{ url_for('addMenuSection') }}">Add Menu Section</a></li>
+    <li><a href="{{ url_for('addMenuItem') }}">Add Menu Item</a></li>
+    <li><a href="{{ url_for('displayMenu') }}">Display Menus</a></li>
+          
+    
+
+{% endblock %}

@@ -2,11 +2,11 @@ from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
 from .forms import SignupForm,SigninForm,CreateMenuForm,AddMenuSectionForm
-m
 from .models import User
 
 
 """---------------  MENU METHODS -----------------------------------"""
+"""
 
 @app.route('/createMenu',method=['GET','POST'])
 @login_required
@@ -16,6 +16,7 @@ def createMenu():
   if request.method == 'GET':
     if form.validate() == False:
       #TODO - return the create menu form html page
+      return
 
   newMenu = Menu(form.menuName.data)
 
@@ -27,6 +28,7 @@ def createMenu():
 
   if request.method == 'POST':
     #TODO - return the Create Menu Form html page
+    return
 
 
 @app.route('/addMenuSection',method=['GET','POST'])
@@ -37,6 +39,7 @@ def addMenuSection():
   if request.method == 'GET':
     if form.validate()==False:
       #TODO
+      return
 
   newMenuSection = MenuSection(form.sectionName.data)
 
@@ -45,14 +48,16 @@ def addMenuSection():
 
   return redirect(url_for('displayMenu'))
 
-  elif request.method == 'POST':
+  if request.method == 'POST':
     #TODO
+    return
 
 
 @app.route('/addMenuItem',method=['GET','POST'])
 @login_required
 def addMenuItem():
   #TODO
+  return
 
 
 
@@ -60,6 +65,7 @@ def addMenuItem():
 @login_required
 def editMenuItem():
   #TODO
+  return
 
 
 
@@ -67,8 +73,9 @@ def editMenuItem():
 @login_required
 def displayMenu():
   #TODO
+  return
 
-
+"""
 """-------------------ORDERING METHODS ---------------------------------"""
 
 
@@ -128,7 +135,7 @@ def signup():
             
       session['employee_id'] = newUser.employee_id
       flash('Successful Signup')
-      flash("This is Your User ID: %s \n You Must Remember this and use it to Log In from now on",employee_id)
+      flash("This is Your User ID: %s \n You Must Remember this and use it to Log In from now on" % newUser.employee_id)
       return redirect(url_for('login'))
    
   elif request.method == 'GET':
@@ -175,7 +182,7 @@ def login():
 @app.route('/removeUser')
 @login_required
 def removeUser():
-  users = g.user 
+  user = g.user 
   db.session.delete(user)
   db.session.commit()
   flash("Removed Successfully")
