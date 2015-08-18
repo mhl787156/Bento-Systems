@@ -24,7 +24,7 @@ class CreateMenuForm(Form):
 
 
 class AddMenuSectionForm(Form):
-  #menu = drop down of all available menus
+  menu = SelectField("Menu" , coerce = int, validators=[validators.Required("PLease choose a menu")])
   sectionName = TextField("Section Name" ,[validators.Required("Please enter a Section Name")])
   
   def __init__(self,*args,**kwargs):

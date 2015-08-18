@@ -55,12 +55,14 @@ class User(db.Model):
         except NameError:
             return str(self.id)  # python 3
 
+    def __repr__(self):
+      return '< User: %r Password: %r >' % (self.employee_id,self.password)
 
 
 """//////////////////////////////////////////////////////////////
                         MENU DATABASE ITEMS
 /////////////////////////////////////////////////////////////"""
-"""
+
 
 class Menu(db.Model):
     #Items
@@ -77,14 +79,14 @@ class Menu(db.Model):
     def __init__(self,menu_name):
       self.updateMenu(menu_name)
 
-    def updateMenu(self,menu_name):
-      if menu_name is not none:
+    def updateMenu(self,menu_name=None):
+      if menu_name is not None:
         self.menu_name = menu_name.lower()
       
       self.set_last_date_changed()
       self.set_total_number_of_sections()
       self.set_total_number_of_items()
-
+    
     def get_total_number_of_sections(self):
       return self.total_number_of_sections
 
@@ -98,7 +100,7 @@ class Menu(db.Model):
       counter = 0
       list_of_sections = self.menu_sections.all()
       for section in list_of_sections:
-        counter = counter + len(section.get_total_number_of_items())
+        counter = counter + section.get_total_number_of_items()
       self.total_number_of_items = counter  
 
     def set_last_date_changed(self):
@@ -109,7 +111,7 @@ class Menu(db.Model):
 
     def __repr__(self):
       return '< Menu: %r , last_date_changed: %r , numSections: %r , numItems: %r>' % (self.menu_name,self.last_date_changed,self.total_number_of_sections,self.total_number_of_items)
-    
+
 class MenuSection(db.Model):
     #Items
     id = db.Column(db.Integer , primary_key=True)
@@ -119,24 +121,26 @@ class MenuSection(db.Model):
     
     #Relationships
     #one -> many with 
-    section_items = db.relationship('MenuItems',backref='section',lazy='dynamic')
+    #section_items = db.relationship('MenuItem',backref='section',lazy='dynamic')
 
     def __init__(self,section_name):
       self.updateMenuSection(section_name)
 
     def updateMenuSection(self,name):
-      if name is not none:
+      if name is not None:
         self.section_name = name
       self.set_total_number_of_items()   
 
     def set_total_number_of_items(self):
-      self.total_number_of_items = len(self.section_items.all())
+      self.total_number_of_items = 0 #len(self.section_items.all())
 
 
     def get_total_number_of_items(self):
       return self.total_number_of_items
-      
-  
+
+    def __repr__(self):
+      return '< MenuSection: %r   Number_of_items: %r >' % (self.section_name,self.total_number_of_items)
+
 
 class MenuItem(db.Model):  
     #Items
@@ -148,7 +152,7 @@ class MenuItem(db.Model):
     availability = db.Column(db.Boolean())
     ingrediants = db.Column(db.String(256))
     allergens = db.Column(db.String(256))
-    menuSection_id = db.Column(db.Integer,db.ForeignKey('menusection.id'))
+    #menusection_id = db.Column(db.Integer,db.ForeignKey('menusection.id'))
 
     #Relations
     #many <-> many , orderItem <-> menuItem
@@ -204,7 +208,6 @@ class MenuItem(db.Model):
       return '< ItemName: %r , Price %r >' % (self.item_name , self.price)
 
 #Might be right thing to do??
-"""
 
 """
 menuItem_orderItem = db.Table('menuItem_orderItem',[
@@ -301,8 +304,9 @@ class OrderItem(db.Model):
 
     def __repr__(self):
       return '< OrderItem: %r >' % item_number
+"""
 
-
+"""
 class OrderCounter(db.Model):
     #Fields
     id = db.Column(db.Integer , primary_key=True)
@@ -335,6 +339,7 @@ class OrderLogger(db.Model):
     #Relationship Fields
 
 """
+
 
 
 

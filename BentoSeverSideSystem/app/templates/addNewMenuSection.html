@@ -4,12 +4,19 @@
 {% block content %}
   <h2>Add A Menu Section</h2>
  
+  {% for message in form.menu.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
   {% for message in form.sectionName.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
    
   <form action="{{ url_for('addMenuSection') }}" method=post>
-     
+    
+    {{form.menu.label}}
+    {{form.menu}}
+
     {{ form.sectionName.label }}
     {{ form.sectionName }}
      

@@ -2,58 +2,59 @@ from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
 from .forms import SignupForm,SigninForm,CreateMenuForm,AddMenuSectionForm
-from .models import User
+from .models import User,Menu,MenuSection,MenuItem
 
 
 """---------------  MENU METHODS -----------------------------------"""
-"""
 
-@app.route('/createMenu',method=['GET','POST'])
+@app.route('/createMenu',methods=['GET','POST'])
 @login_required
 def createMenu():
   form = CreateMenuForm()
 
   if request.method == 'GET':
     if form.validate() == False:
-      #TODO - return the create menu form html page
-      return
+      return render_template('createNewMenu.html',title='Create New Menu',form=form)
 
   newMenu = Menu(form.menuName.data)
 
   db.session.add(newMenu)
   db.session.commit()
+  flash('New Menu Created')
   
   #Redirect to menu display page so user can view menu
   return redirect(url_for('displayMenu'))
 
   if request.method == 'POST':
-    #TODO - return the Create Menu Form html page
-    return
+    return render_template('createNewMenu.html',title='Create New Menu',form=form)
 
 
-@app.route('/addMenuSection',method=['GET','POST'])
+@app.route('/addMenuSection',methods=['GET','POST'])
 @login_required
 def addMenuSection():
   form = AddMenuSectionForm()
+  form.menu.choices=[(g.id,g.menu_name) for g in Menu.query.order_by('menu_name')]
 
   if request.method == 'GET':
     if form.validate()==False:
-      #TODO
-      return
+      return render_template('addNewMenuSection.html',title='Add New Menu Section',form=form)
 
   newMenuSection = MenuSection(form.sectionName.data)
 
-  db.session.add(newMenu)
+  chosenmenu = Menu.query.get(form.menu.data)
+  chosenmenu.menu_sections.append(newMenuSection)
+  chosenmenu.updateMenu()
+
+  db.session.add(newMenuSection)
   db.session.commit()
 
+  flash("New Section added Successfully")
   return redirect(url_for('displayMenu'))
 
   if request.method == 'POST':
-    #TODO
-    return
+    return render_template('addNewMenuSection.html',title='Add New Menu Section',form=form)
 
-
-@app.route('/addMenuItem',method=['GET','POST'])
+@app.route('/addMenuItem',methods=['GET','POST'])
 @login_required
 def addMenuItem():
   #TODO
@@ -61,7 +62,7 @@ def addMenuItem():
 
 
 
-@app.route('/editMenuItem',method=['GET','POST'])
+@app.route('/editMenuItem',methods=['GET','POST'])
 @login_required
 def editMenuItem():
   #TODO
@@ -75,7 +76,6 @@ def displayMenu():
   #TODO
   return
 
-"""
 """-------------------ORDERING METHODS ---------------------------------"""
 
 

@@ -2,12 +2,12 @@
 
 import unittest
 
-from xmlTestrunner import XMLTestRunner
+from SectionTests.xmlTestrunner import XMLTestRunner
 
 loader = unittest.TestLoader()
 
-tests = loader.discover()
-#tests = loader.discover('SectionTests',pattern = 'test*.py')
+#tests = loader.discover()
+tests = loader.discover('SectionTests',pattern = 'test*.py')
 
 runner = XMLTestRunner()
 

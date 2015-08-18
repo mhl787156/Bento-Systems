@@ -5,8 +5,8 @@ import unittest
 
 loader = unittest.TestLoader()
 
-tests = loader.discover('.')
-#tests = loader.discover('SectionTests',pattern = 'test*.py')
+#tests = loader.discover('.')
+tests = loader.discover('SectionTests',pattern = 'test*.py')
 
 runner = unittest.TextTestRunner()
 

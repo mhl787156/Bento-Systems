@@ -1,0 +1,20 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+ 
+{% block content %}
+  <h2>Create a New Menu</h2>
+ 
+  {% for message in form.menuName.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+   
+  <form action="{{ url_for('createMenu') }}" method=post>
+     
+    {{ form.menuName.label }}
+    {{ form.menuName }}
+     
+    {{ form.submit }}
+
+  </form>
+     
+{% endblock %}
