@@ -1,4 +1,4 @@
-from models import db, User
+from models import db, User,Menu
 from flask import g
 from flask.ext.wtf import Form
 from wtforms import SelectField , TextField, SubmitField, ValidationError, PasswordField , validators , IntegerField
@@ -8,25 +8,49 @@ from wtforms import SelectField , TextField, SubmitField, ValidationError, Passw
                     Menu Forms
 /////////////////////////////////////////////////////////"""
 class CreateMenuForm(Form):
-  menuName = TextField("Menu Name" , [validators.Required("Please enter a Menu Name.")])
+  #menuName = TextField("Menu Name", validators=[validators.Required("Please enter a Menu Name.")])
+  menuName = TextField("Menu Name",default='Menu1')
+  submit = SubmitField("Add to Database")
   
   def __init__(self,*args,**kwargs):
     Form.__init__(self,*args,**kwargs)
 
   def validate(self):
     if not Form.validate(self):
+      print str(Form.validate(self)) + ' original form does not validate, menuName.data: ' + self.menuName.data
       return False
 
-    if User.querty.filter_by(menu_name = self.menuName.data.lower()).first() is not None:
+    if Menu.query.filter_by(menu_name = self.menuName.data.lower()).first() is not None:
       self.menuName.errors.append('Duplicated menu name')
+      flash('Duplicated Name')
       return False
     return True
+
+class SelectMenuForm(Form):
+  menu = SelectField("Menu",coerce = int, choices=[(g.id,g.menu_name) for g in Menu.query.order_by('menu_name')]
+                       , validators = [validators.Required("Please choose a menu")])
+  def validate(self):
+    return Form.validate(self)
 
 
 class AddMenuSectionForm(Form):
-  menu = SelectField("Menu" , coerce = int, validators=[validators.Required("PLease choose a menu")])
-  sectionName = TextField("Section Name" ,[validators.Required("Please enter a Section Name")])
+  menu = SelectField("Menu" , coerce = int,default=1)
+  sectionName = TextField("Section Name" ,validators=[validators.Required("Please enter a Section Name")])
+  submit = SubmitField("Add to Database")
   
+  def __init__(self,*args,**kwargs):
+    Form.__init__(self,*args,**kwargs)
+
+  def validate(self):
+    return Form.validate(self)
+
+class AddMenuItemForm(Form):
+  menu = SelectField("Menu", coerce = int,validators=[validators.Required("Please choose a menu")])
+  menusubmit = SubmitField("Select Menu")
+  section = SelectField("Section",  coerce = int,validators=[validators.Required("Please choose a section")])
+
+  submit = SubmitField("Add to Database")
+ 
   def __init__(self,*args,**kwargs):
     Form.__init__(self,*args,**kwargs)
 
@@ -34,6 +58,10 @@ class AddMenuSectionForm(Form):
     if not Form.validate(self):
       return False
     return True
+
+
+ 
+
 
 """/////////////////////////////////////////////////////////
                     Profile Forms

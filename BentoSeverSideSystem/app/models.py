@@ -8,6 +8,7 @@ from random import randint
 /////////////////////////////////////////////////////////////"""
 
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     employee_id = db.Column(db.String(64), index=True, unique=True)
     firstname = db.Column(db.String(64))
@@ -65,6 +66,7 @@ class User(db.Model):
 
 
 class Menu(db.Model):
+    __tablename__ = 'menu'
     #Items
     id = db.Column(db.Integer, primary_key=True)
     menu_name = db.Column(db.String(64),unique = True,index=True)
@@ -113,15 +115,16 @@ class Menu(db.Model):
       return '< Menu: %r , last_date_changed: %r , numSections: %r , numItems: %r>' % (self.menu_name,self.last_date_changed,self.total_number_of_sections,self.total_number_of_items)
 
 class MenuSection(db.Model):
+    __tablename__ = 'menusection'
     #Items
     id = db.Column(db.Integer , primary_key=True)
     section_name = db.Column(db.String(64),unique=True,index=True)
     total_number_of_items = db.Column(db.Integer())
     menu_id = db.Column(db.Integer,db.ForeignKey('menu.id'))
-    
+
     #Relationships
     #one -> many with 
-    #section_items = db.relationship('MenuItem',backref='section',lazy='dynamic')
+    section_items = db.relationship('MenuItem',backref='section',lazy='dynamic')
 
     def __init__(self,section_name):
       self.updateMenuSection(section_name)
@@ -143,6 +146,7 @@ class MenuSection(db.Model):
 
 
 class MenuItem(db.Model):  
+    __tablename__ = 'menuitem'
     #Items
     id = db.Column(db.Integer , primary_key=True)
     item_name = db.Column(db.String(64),unique=True,index=True)
@@ -152,11 +156,11 @@ class MenuItem(db.Model):
     availability = db.Column(db.Boolean())
     ingrediants = db.Column(db.String(256))
     allergens = db.Column(db.String(256))
-    #menusection_id = db.Column(db.Integer,db.ForeignKey('menusection.id'))
+    menusection_id = db.Column(db.Integer,db.ForeignKey('menusection.id'))
 
     #Relations
     #many <-> many , orderItem <-> menuItem
-    #TODO
+    #TODO 
     
     def __init__(self,item_name,price,sd,ld,a,i,al):
       set_item_name(item_name)

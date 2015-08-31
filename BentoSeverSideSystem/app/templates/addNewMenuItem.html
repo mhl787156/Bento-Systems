@@ -1,0 +1,23 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+ 
+{% block content %}
+  <h2>Add A Menu Item</h2>
+ 
+  {% for message in form.section.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+   
+  <form action="{{ url_for('addMenuItem') }}" method=post>
+     
+    <p>{{ form.menu.label }}
+    {{ form.menu }}   {{form.menusubmit}}</p>
+    
+    <p>{{ form.section.label }}
+    {{ form.section }}</p>
+     
+    <p>{{ form.submit }}</p>
+
+  </form>
+     
+{% endblock %}
