@@ -1,0 +1,16 @@
+flask
+flask-httpauth
+flask-restful
+flask-login
+flask-mail
+flask-sqlalchemy
+sqlalchemy-migrate
+flask-wtf
+guess_language
+flipflop
+coverage
+
+Jinja2
+MarkupSafe
+Werkzeug
+

@@ -59,6 +59,26 @@ class User(db.Model):
     def __repr__(self):
       return '< User: %r Password: %r >' % (self.employee_id,self.password)
 
+class Device(db.Model):
+    __tablename__ = 'devices'
+    id = db.Column(db.Integer, primary_key=True)
+    device_id = db.Column(db.String(64), index=True, unique=True)
+    pwdhash = db.Column(db.String(54))
+ 
+    def __init__(self, device_id , password):      
+        device_id = device_id
+        self.set_password(password)
+
+    def set_password(self, password):
+        self.pwdhash = generate_password_hash(password)
+   
+    def check_password(self, password):
+        return check_password_hash(self.pwdhash, password)
+
+
+    def __repr__(self):
+      return '< Device_id: %r >' % (self.device_id)
+
 
 """//////////////////////////////////////////////////////////////
                         MENU DATABASE ITEMS
