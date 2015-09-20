@@ -5,6 +5,7 @@ flask-login
 flask-mail
 flask-sqlalchemy
 sqlalchemy-migrate
+flask-migrate
 flask-wtf
 guess_language
 flipflop

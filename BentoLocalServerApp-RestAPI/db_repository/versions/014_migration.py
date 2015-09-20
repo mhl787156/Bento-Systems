@@ -24,23 +24,27 @@ menu_section = Table('menu_section', pre_meta,
     Column('menu_id', INTEGER),
 )
 
+devices = Table('devices', post_meta,
+    Column('id', Integer, primary_key=True, nullable=False),
+    Column('device_id', String(length=64)),
+    Column('pwdhash', String(length=54)),
+)
+
 menuitem = Table('menuitem', post_meta,
     Column('id', Integer, primary_key=True, nullable=False),
     Column('item_name', String(length=64)),
-    Column('price', Integer),
+    Column('price', Numeric(precision=2)),
     Column('short_description', String(length=128)),
     Column('long_description', String(length=256)),
     Column('availability', Boolean),
     Column('ingrediants', String(length=256)),
     Column('allergens', String(length=256)),
-    Column('menusection_id', Integer),
 )
 
 menusection = Table('menusection', post_meta,
     Column('id', Integer, primary_key=True, nullable=False),
     Column('section_name', String(length=64)),
     Column('total_number_of_items', Integer),
-    Column('menu_id', Integer),
 )
 
 
@@ -51,6 +55,7 @@ def upgrade(migrate_engine):
     post_meta.bind = migrate_engine
     pre_meta.tables['menu_item'].drop()
     pre_meta.tables['menu_section'].drop()
+    post_meta.tables['devices'].create()
     post_meta.tables['menuitem'].create()
     post_meta.tables['menusection'].create()
 
@@ -61,5 +66,6 @@ def downgrade(migrate_engine):
     post_meta.bind = migrate_engine
     pre_meta.tables['menu_item'].create()
     pre_meta.tables['menu_section'].create()
+    post_meta.tables['devices'].drop()
     post_meta.tables['menuitem'].drop()
     post_meta.tables['menusection'].drop()
