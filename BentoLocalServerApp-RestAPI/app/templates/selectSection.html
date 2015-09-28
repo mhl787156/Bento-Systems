@@ -1,0 +1,31 @@
+<!-- extend menubase layout -->
+{% extends "menubase.html" %}
+ 
+{% block menucontent %}
+  <h2>Select Section</h2>
+  
+  {% for message in form.privateSections.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.publicSections.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  <form action="{{ url_for('selectSection',url=url) }}" method=post>
+   
+    <h4>Choose a public section</h4>
+    <p>{{form.publicSections.label}}
+    {{form.publicSections}}</p>
+
+    <p>{{ form.pubsubmit }}</p>
+
+    <h4>Choose a private section</h4>
+    <p>{{form.privateSections.label}}
+    {{form.privateSections}}</p>
+
+    <p>{{ form.privsubmit}}</p>
+
+  </form>
+     
+{% endblock %}

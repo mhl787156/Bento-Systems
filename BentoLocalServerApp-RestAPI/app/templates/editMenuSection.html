@@ -1,19 +1,120 @@
-<!-- extend base layout -->
-{% extends "base.html" %}
+<!-- extend menubase layout -->
+{% extends "menubase.html" %}
  
-{% block content %}
-  <h2>Add A Menu Section</h2>
- 
+{% block menucontent %}
+  <h2>Edit A Menu Section</h2>
+  
   {% for message in form.sectionName.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
+
+  {% for message in form.visibility.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.s_s_o.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.items.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
    
-  <form action="{{ url_for('addMenuSection') }}" method=post>
+  <form action="{{ url_for('editMenuSection',data = section.id) }}" method=post>
+    
+    <h4>Section Summary</h4>
+    <p>Chosen Section is: {{section.section_name}}</p>
+    {% if not section.number_of_groups == 0 %}
+    <p>
+	<li>Number of Subgroups: {{section.number_of_groups}}</li>
+        <li>Total Number of Items: {{section.total_number_of_items}}</li>
+        Subsections and Items currently in this menu:
+    </p>
+	<ol>
+	{% for sec in section.getSubSections() %}
+	  <li><a href="{{ url_for('editMenuSection',data=sec.id) }}">{{sec.section_name}}</a></li>
+	  {%if sec.total_number_of_items == 0 %}<p>Section has no items</p>
+	  {%else%}
+	  <ul>
+	  {% for item in sec.getItems() %}
+            <li><a href="{{ url_for('editMenuItem',data=item.id) }}">{{item.item_name}}</a></li>
+	  {%endfor%}
+          </ul>
+	  {%endif%}
+        {%endfor%}	  
+	</ol>
+ 
+    {%else%}
+    <p>
+	<br><li>Number of Items: {{section.total_number_of_items}}</li>
+        <br>Items currently in this menu:
+    </p>
+        {%if section.total_number_of_items == 0 %}
+        	<p>(No Items have been added)</p>
+        {%else%}
+	<ul>
+        {% for item in section.getItems() %}
+          <li><a href="{{ url_for('editMenuItem',data=item.id) }}">{{item.item_name}}</a></li>
+	{%endfor%}
+        </ul>
+ 	{%endif%}
+
+    {%endif%}
+    <br>
+    <h4>Edit Section Properties</h4>
+    <p>{{ form.sectionName.label }}
+    {{ form.sectionName}}</p>
+
+    <p>{{ form.visibility.label}}
+    {{form.visibility}}</p>
+
+    <p>{{form.s_s_o.label}}
+    {{form.s_s_o}}</p>
+
+    <p>{{form.ppSubmit}}</p>
+
+    <br>
+    {%if section.number_of_groups == 0%}
+    <h4>Remove Section Item</h4>
+    <p>{{form.itemRemove.label}}
+    {{form.itemRemove}} <br>{{form.itemRmSubmit}}</p>
+
+    {%else%}
+    <h4>Remove SubSection</h4>
+    <p>{{form.subsectionRemove.label}}
+    {{form.subsectionRemove}} <br>{{form.ssRmSubmit}}</p>
+
+    {%endif%}
+
+    <br>
+    <h4>Add or Edit SubSections</h4>
+    <p>{{form.subsection.label}}
+    {{form.subsection}}</p>
+
+    <p>{{form.sssubmit}}</p>
+
+
+    <br>
+    <h4>Add or Edit Section Items</h4>
+    {% if not section.number_of_groups == 0 %}
+	<p>Items will not show up because this group contains subsections</p>
+    {%else%}{%endif%}
+    <p>{{ form.items.label }}
+    {{ form.items }}</p>
      
-    {{ form.sectionName.label }}
-    {{ form.sectionName }}
-     
-    {{ form.submit }}
+    <p>{{ form.itemsubmit }}</p>
+    
+
+    
+    
+    
+    <br>
+    <h4>Remove Section</h4>
+    <p>
+    {{form.remove}}<br>
+    This cannot be undone<br>
+    WARNING: THIS WILL REMOVE THIS SECTION
+    </p>
 
   </form>
      

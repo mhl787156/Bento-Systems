@@ -2,17 +2,17 @@
 {% extends "menubase.html" %}
  
 {% block menucontent %}
-  <h2>Create a New Menu</h2>
+  <h2>Select Item</h2>
  
-  {% for message in form.menuName.errors %}
+  {% for message in form.item.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
-   
-  <form action="{{ url_for('addMenu') }}" method=post>
-     
-    <p>{{ form.menuName.label }}
-    {{ form.menuName }}</p>
-     
+
+  <form action="{{ url_for('selectItem',url=url) }}" method=post>
+    
+    <p>{{form.item.label}}
+    {{form.item}}</p>
+
     <p>{{ form.submit }}</p>
 
   </form>

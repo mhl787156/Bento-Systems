@@ -1,10 +1,39 @@
-{% extends "base.html" %}
-{% block content %}
-    <h1> INDEX PAGE</h1>
-    
-    <h2> Displaying Menu</h2>
+{% extends "menubase.html" %}
+{% block menucontent %}
+  
+  <h2>Display a menu</h2>
+  
+  {% for message in form.menu.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
 
-    <p> Menu Will Display Here!</p>    
+  
+  <form action="{{ url_for('displayMenus') }}" method=post>
+    
+    <p>{{form.menu.label}}
+    {{form.menu}}  {{ form.submit }}</p>
+
+  </form>
+  
+  {%if form.menu.data%}
+    {%if menu.menu_sections.all() == []%}
+      <p>This Menu is Empty<p>
+    {%else%}
+      <ol>
+      {%for section in menu.menu_sections.all()%}
+        <li>{{section.section_name}}</li>
+      
+        <ul>
+        {%for item in section.section_items.all()%}
+          <li>{{item.item_name}}</li>
+        {%endfor%}
+        </ul>
+
+      {%endfor%}
+      </ol>
+    {%endif%}
+  {%endif%}
+
     
 
 {% endblock %}

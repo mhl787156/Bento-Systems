@@ -1,19 +1,60 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
-from .forms import SignupForm,SigninForm,CreateMenuForm,AddMenuSectionForm,AddMenuItemForm
+from .forms import SelectItemForm,SelectSectionForm,SelectMenuForm,SignupForm,SigninForm,AddorEditMenuForm,AddorEditMenuSectionForm,AddorEditMenuItemForm
 from .models import User,Menu,MenuSection,MenuItem
 
 
 """---------------  MENU METHODS -----------------------------------"""
-
-@app.route('/createMenu',methods=['GET','POST'])
+"""helpers"""
+@app.route('/<path:url>/selectMenu/',methods=['GET','POST'])
 @login_required
-def createMenu():
-  form = CreateMenuForm()
+def selectMenu(url=None):
+  form = SelectMenuForm()
+  form.menu.choices = [(g.id,g.menu_name) for g in Menu.query.order_by('menu_name')]
+  if request.method == 'POST':
+    if form.validate():
+      chosenMenuId = form.menu.data
+      print url_for(url,data=chosenMenuId)
+      return redirect(url_for(url,data=chosenMenuId))
+    flash("validation failed")
+  return render_template('selectMenu.html',title='Select a Menu',form=form,url=url)
+   
+@app.route('/<path:url>/selectSection/',methods=['GET','POST'])
+@login_required
+def selectSection(url=None):
+  form = SelectSectionForm()
+  form.publicSections.choices = [(g.id,g.section_name) for g in MenuSection.query.filter(MenuSection.visibility==True)]
+  form.privateSections.choices = [(g.id,g.section_name) for g in MenuSection.query.filter(MenuSection.number_of_groups == 0)]
+  if request.method == 'POST':
+    if form.pubsubmit.data and form.publicSections.choices.data:
+      return redirect(url_for(url,data=form.publicSections.data))
+    if form.privsubmit.data and form.privateSections.data:
+      return redirect(url_for(url,data=form.privateSections.data))
+    flash("validation failed")
+  return render_template('selectSection.html',title='Selectal a Section', form = form,url=url)
+  
+@app.route('/<path:url>/selectItem/',methods=['GET','POST'])
+@login_required
+def selectItem(url=None):
+  form = SelectItemForm()
+  form.item.choices = [(g.id,g.item_name) for g in MenuItem.query.order_by('item_name')]
+  if request.method == 'POST':
+    if form.validate():
+      chosenItemId = form.item.data
+      return redirect(url_for(url,data=chosenItemId))
+    flash("validation failed")
+  return render_template('selectItem.html',title = 'Select an Item',form=form,url=url)
+
+"""mains"""
+#DONE - Not Tested
+@app.route('/addMenu',methods=['GET','POST'])
+@login_required
+def addMenu():
+  form = AddorEditMenuForm()
 
   if request.method == 'POST':
-    if not form.validate_on_submit():
+    if not form.validate():
       flash("Validation failed")
       return render_template('createNewMenu.html',title='Create New Menu',form=form)
 
@@ -21,113 +62,278 @@ def createMenu():
 
     db.session.add(newMenu)
     db.session.commit()
-    flash('New Menu Created')
-  
-  #Redirect to menu display page so user can view menu
-    return redirect(url_for('displayMenu'))
+    flash('Menu ' + form.menuName.data + ' has been created')
+    return redirect(url_for('editMenu',data=newMenu.id))
 
   if request.method == 'GET':
     return render_template('createNewMenu.html',title='Create New Menu',form=form)
 
+#DONE - Not Tested
+@app.route('/editMenu/',methods=['GET'])
+@app.route('/editMenu/<int:data>/',methods=['GET','POST'])
+@login_required
+def editMenu(data=None):
+  menu_id = data
+  
+  if data == None:
+    return redirect(url_for('selectMenu',url='editMenu'))
 
+  form = AddorEditMenuForm()
+  menu = Menu.query.get(menu_id)
+  availSections = MenuSection.query.except_(menu.menu_sections)
+  form.sections.choices = [(g.id,g.section_name) for g in availSections]
+  form.removeSection.choices = [(g.id,g.section_name) for g in menu.menu_sections]
+
+  if request.method == 'POST':
+
+    if form.remove.data:
+      for section in menu.getSections():
+        menu.deleteSection(section)
+      db.session.delete(menu)
+      db.session.commit()
+      flash("Menu '{}' has been removed".format(menu.menu_name))
+      return redirect(url_for('index'))
+    
+    if form.cnSubmit.data and form.menuName.data:
+      oname = menu.menu_name
+      menu.updateMenu(menu_name = form.menuName.data)
+      db.session.commit()
+      flash("Menu {} has changed name to {}".format(oname,menu.menu_name))
+
+    if form.rmSecSubmit.data and form.removeSection.data:
+      sec = MenuSection.query.get(form.removeSection.data)
+      if sec in menu.getSections():
+        menu.deleteSection(sec)
+        db.session.commit()
+        flash("Section {} removed from {}".format(sec.section_name,menu.menu_name))
+      else:
+        flash("Section {} does not exist in this menu".format(sec.section_name))
+
+    if form.addSectionSubmit.data and form.sections.data:
+      sec = MenuSection.query.get(form.sections.data)
+      if sec in menu.getSections():
+        flash("Section {} already existed".format(sec.section_name))
+      else:
+        menu.addSection(sec)
+        db.session.commit()
+        flash("Section {} successfully added to {}".format(sec.section_name,menu.menu_name))
+      
+    return redirect(url_for('editMenu',data=data))
+  
+  form.menuName.data=menu.menu_name
+  return render_template('editMenu.html',title='Edit a Menu',form=form,menu=menu)
+
+
+#DONE - Not Tested
 @app.route('/addMenuSection',methods=['GET','POST'])
 @login_required
 def addMenuSection():
-  form = AddMenuSectionForm()
-  form.menu.choices=[(g.id,g.menu_name) for g in Menu.query.order_by('menu_name')]
-  print form.menu.choices
-
+  form = AddorEditMenuSectionForm()
   if request.method == 'POST':
-    if not form.validate_on_submit():
-      print "form not validated: menu.data=%r  , sectionName.data=%r" %(form.menu.data,form.sectionName.data)
+    if not form.validate():
       flash("validation failed")
       return render_template('addNewMenuSection.html',title='Add New Menu Section',form=form)
 
-    newMenuSection = MenuSection(form.sectionName.data)
-
-    chosenmenu = Menu.query.get(form.menu.data)
-    chosenmenu.menu_sections.append(newMenuSection)
-    chosenmenu.updateMenu()
-
+    newMenuSection = MenuSection(form.sectionName.data,
+                                 form.visibility.data,
+                                 form.s_s_o.data)
     db.session.add(newMenuSection)
     db.session.commit()
-
-    flash("New Section added Successfully")
-    return redirect(url_for('displayMenu'))
+    flash(form.sectionName.data + ' successfully created')
+    return redirect(url_for('index'))
 
   if request.method == 'GET':
     return render_template('addNewMenuSection.html',title='Add New Menu Section',form=form)
 
 
-
-#TODO - TEST
-@app.route('/addMenuItem',methods=['GET','POST'])
+@app.route('/editMenuSection',methods=['GET'])
+@app.route('/editMenuSection/<int:data>',methods=['GET','POST'])
 @login_required
-def addMenuItem():
-  form = AddMenuItemForm()
-  form.menu.choices=[(g.id,g.menu_name) for g in Menu.query.order_by('menu_name')]
-  form.section.choices=[]
+def editMenuSection(data=None):
+  section_id = data
+  
+  if data == None:
+    return redirect(url_for('selectSection',url='editMenuSection'))
+ 
+  form = AddorEditMenuSectionForm()
+  section = MenuSection.query.get(section_id)
+  availItems = MenuItem.query.except_(section.section_items)
+  form.items.choices = [(g.id,g.item_name) for g in availItems]
+  availSubSections = MenuSection.query.except_(section.subsections.union(MenuSection.query.filter_by(id=section_id)))
+  form.subsection.choices = [(g.id,g.section_name) for g in availSubSections]
+  form.subsectionRemove.choices=[(g.id,g.section_name) for g in section.subsections]
+  form.itemRemove.choices=[(g.id,g.item_name) for g in section.section_items]
 
   if request.method == 'POST':
-    if form.menu.data and not form.section.data:
-      chosenMenu = Menu.query.get(form.menu.data)
-      form.section.choices=[(g.id,g.section_name) for g in chosenMenu.menu_sections.order_by('section_name')]
-      return render_template('addNewMenuItem.html',title='Add New Menu Item',form=form)
+
+    if form.remove.data:
+      for item in section.getItems():
+        section.deleteItem(item)
+      for section in section.getSubSections():
+        section.deleteSubSection(section)
+      db.session.delete(section)
+      db.session.commit()
+      flash("Section '{}' has been removed".format(section.section_name))
+      return redirect(url_for('index'))
+    
+    if form.ppSubmit.data:
+      oname = section.section_name
+      section.updateMenuSection(name = form.sectionName.data)
+      section.visibility = form.visibility.data
+      section.staggered_service_order = form.s_s_o.data
+      db.session.commit()
+      flash("Section {} has changed name to {} and visibility {} and Staggered Service Order to {}".format(oname,section.section_name,section.visibility,section.staggered_service_order))
+    
+    if form.ssRmSubmit.data and form.subsectionRemove.data:
+      ss=MenuSection.query.get(form.subsectionRemove.data)
+      if ss in section.getSubSections():
+        section.deleteSubSection(ss)
+        db.session.commit()
+        flash("SubSection {} successfully removed from {}".format(ss.section_name,section.section_name))
+      else:
+        flash("SubSection {} doesnt exist in this Section".format(ss.section_name))
+
+    if form.itemRmSubmit.data and form.itemRemove.data:
+      item = MenuItem.query.get(form.itemRemove.data)
+      if item in section.getItems():
+        section.deleteItem(item)
+        db.session.commit()
+        flash("Item {} successfully removed from {}".format(item.item_name,section.section_name))
+      else:
+        flash("Item {} doesnt exist in this Section.".format(item.item_name))
+   
+    
+    if form.sssubmit.data and form.subsection.data:
+      ss=MenuSection.query.get(form.subsection.data)
+      if ss in section.getSubSections():
+        flash("Section {} already existed".format(ss.section_name))
+      else:
+        section.addSubSection(ss)
+        db.session.commit()
+        flash("Section {} successfully added to {}".format(ss.section_name,section.section_name))
+    
+    if form.itemsubmit.data and form.items.data:
+      item = MenuItem.query.get(form.items.data)
+      if item in section.getItems():
+        flash("Item {} already existed".format(item.item_name))
+      else:
+        section.addItem(item)
+        db.session.commit()
+        flash("Item {} successfully added to {}".format(item.item_name,section.section_name))
+      
+    return redirect(url_for("editMenuSection",data=data))
+  
+  form.sectionName.data=section.section_name
+  form.visibility.data=section.visibility
+  form.s_s_o.data = section.staggered_service_order
+  return render_template('editMenuSection.html',title='Edit a Section',form=form,section=section)
+
+
+@app.route('/addMenuItem/',methods=['GET','POST'])
+@login_required
+def addMenuItem():
+  form = AddorEditMenuItemForm()
+  if request.method == 'POST':
+    
     if form.validate()==False:
       return render_template('addNewMenuItem.html', title='Add New Menu Item',form=form)
 
-    newMenuItem = None #MenuItem('yadayadayadayada')
+    newMenuItem = MenuItem(form.item_id.data,
+                           form.item_name.data,
+                           form.price.data,
+                           form.short_description.data,
+                           form.long_description.data,
+                           form.availability.data,
+                           form.ingrediants.data,
+                           form.allergens.data)
     
-    chosenMenu = Menu.query.get(form.menu.data)
-    chosenSection = MenuSection.query.get(form.section.data)
-    chosenSection.section_items.append(newMenuItem)
-    chosenMenu.updateMenu()
-
     db.session.add(newMenuItem)
     db.session.commit()
 
-    flash("New Item added Successfully")
-    return redirect(url_for('displayMenu'))
+    flash(form.item_name.data + " created Successfully" )
+    return redirect(url_for('index'))
 
   if request.method == 'GET':
     return render_template('addNewMenuItem.html' ,title='Add New Menu Item',form=form)
 
 
-
-@app.route('/editMenu',methods=['Get','Post'])
+@app.route('/editMenuItem/',methods=['GET'])
+@app.route('/editMenuItem/<int:data>/',methods=['GET','POST'])
 @login_required
-def editMenu():
-  #TODO
-  return
+def editMenuItem(data=None):
+  item_id = data
+  if data==None:
+    return redirect(url_for('selectItem',url='editMenuItem'))
+
+  form = AddorEditMenuItemForm()
+  item = MenuItem.query.get(item_id)
+  
+  if request.method == 'POST':
+    
+    if form.remove.data:
+      db.session.delete(item)
+      db.session.commit()
+      flash(item.item_name + 'removed from Database')
+      return redirect(url_for('index'))
+    
+    if form.ppItemSubmit.data:      
+    
+      item.updateItem(form.item_id.data,
+                      form.item_name.data,
+                      form.price.data,
+                      form.short_description.data,
+                      form.long_description.data,
+                      form.availability.data,
+                      form.ingrediants.data,
+                      form.allergens.data)
+      db.session.commit()
+    
+      flash(item.item_name + " successfully edited, database modified ")
+
+    return render_template('editMenuItem.html',title='Edit Menu Item',form=form,item=item)
+
+  form.item_id.data = item.item_id
+  form.item_name.data = item.item_name
+  form.price.data = item.price
+  form.short_description.data = item.short_description
+  form.long_description.data = item.long_description
+  form.availability.data = item.availability
+  form.ingrediants.data = item.ingrediants
+  form.allergens.data = item.allergens
+  return render_template('editMenuItem.html' ,title='Edit Menu Item',form=form,item=item)
 
 
-@app.route('/editMenuSection',methods=['Get','Post'])
+
+@app.route('/displayMenu',methods=['GET','POST'])
 @login_required
-def editMenuSection():
-  #TODO
-  return
+def displayMenus():
+  form = SelectMenuForm()
+  menu = Menu.query.get(1)
+  form.menu.choices=[(g.id,g.menu_name) for g in Menu.query.order_by('menu_name')]
+  
+  if request.method == 'POST' and form.validate():
+    menu = Menu.query.get(form.menu.data)
+    return render_template('displayMenu.html',title='Display Menu: {}'.format(menu.menu_name),menu=menu,form=form)
+
+  return render_template('displayMenu.html',title='Display Menu',menu=menu,form=form)
 
 
+@app.route('/displayMenu/<menu_name>')
+def displayMenu(menu_name):
+  form=SelectMenuForm()
+  form.menu.choices=[(g.id,g.menu_name) for g in Menu.query.order_by('menu_name')]
+  menu=Menu.query.filter_by(menu_name = menu_name).first()
+  form.menu.data = menu.id
+  return render_template('displayMenu.html',
+                          title = 'Display Menu: {}'.format(menu_name),
+                          menu=menu,
+                          form=form)
 
-@app.route('/editMenuItem',methods=['GET','POST'])
-@login_required
-def editMenuItem():
-  #TODO
-  return
-
-
-
-@app.route('/displayMenu')
-@login_required
-def displayMenu():
-  #TODO
-  return render_template('displayMenu.html')
 
 """-------------------ORDERING METHODS ---------------------------------"""
 
-
-
-
+#Ordering methods are note going to be part of the form based UI
+#Ordering is to be done by the Restful API only for the time being
 
 """--------------- PERSONAL PAGES METHODS ------------------------------"""
 
@@ -137,16 +343,12 @@ def displayMenu():
 @login_required
 def index():
   user = g.user
-  return render_template('index.html',
-                           title='Index',
-                           user=user)
+  return render_template('index.html',title='Index',user=user)
 
 @app.route('/profile')
 @login_required
-def profile():
-    
+def profile():    
     user = g.user    
-
     return render_template('profile.html', user = user , title=user.employee_id + "'s Profile")
 
 

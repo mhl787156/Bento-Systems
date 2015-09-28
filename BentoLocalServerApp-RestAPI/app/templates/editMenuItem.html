@@ -2,11 +2,11 @@
 {% extends "menubase.html" %}
  
 {% block menucontent %}
-  <h2>Add A Menu Item</h2>
-  
+  <h2>Edit A Menu Item</h2>
+ 
   {% for message in form.item_id.errors %}
     <div class="flash">{{ message }}</div>
-  {% endfor %} 
+  {% endfor %}
 
   {% for message in form.item_name.errors %}
     <div class="flash">{{ message }}</div>
@@ -17,7 +17,14 @@
   {% endfor %}
 
    
-  <form action="{{ url_for('addMenuItem') }}" method=post>
+  <form action="{{ url_for('editMenuItem',data=item.id) }}" method=post>
+   
+    <h4>Item Summary</h4>
+
+
+
+    <br>
+    <h4>Edit Item Properties</h4>
     <p>{{form.item_id.label}}
     {{form.item_id}}</p>
 
@@ -42,8 +49,13 @@
     <p>{{ form.allergens.label }}<br>
     {{ form.allergens }}</p>
     
-    <p>{{ form.submit }}</p>
+    <p>{{ form.ppItemSubmit }}</p>
 
+    <br>
+    <h4>Remove Item</h4>
+    {{form.remove}}<br>
+    An item cannot be recovered after deleting.
+    You may wish to change the availability instead</p>
   </form>
      
 {% endblock %}

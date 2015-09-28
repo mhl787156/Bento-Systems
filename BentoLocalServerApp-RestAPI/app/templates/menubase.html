@@ -1,0 +1,23 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+ 
+{% block content %}
+  <h3>Menu Editing</h3>
+ 
+  <div>
+    {% block menucontent %}
+    {% endblock %}
+  </div>
+
+
+  <hr>
+  <h3>Menu Editing quick links</h3>
+  <li><a href="{{ url_for('addMenu') }}">Add a New Menu</a></li>
+  <li><a href="{{ url_for('editMenu') }}">Edit Menu Details</a></li>
+  <li><a href="{{ url_for('addMenuSection') }}">Add Menu Section</a></li>
+  <li><a href="{{ url_for('editMenuSection') }}">Edit Menu Section</a></li>
+  <li><a href="{{ url_for('addMenuItem') }}">Add Menu Section Item</a></li>
+  <li><a href="{{ url_for('editMenuItem') }}">Edit Menu Section Item</a></li>
+  <li><a href="{{ url_for('displayMenus') }}">Display Menus</a></li>
+
+{% endblock %}

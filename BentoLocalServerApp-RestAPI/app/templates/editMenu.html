@@ -1,19 +1,61 @@
 <!-- extend base layout -->
-{% extends "base.html" %}
+{% extends "menubase.html" %}
  
-{% block content %}
-  <h2>Create a New Menu</h2>
- 
+{% block menucontent %}
+  <h2>Edit or Remove Menu</h2>
+  
   {% for message in form.menuName.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
+
+  {% for message in form.sections.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
    
-  <form action="{{ url_for('createMenu') }}" method=post>
+  <form action="{{ url_for('editMenu',data=menu.id) }}" method=post>
+    
+    
+    <h4>Menu Summary</h4>
+    <p>Chosen Menu is: {{menu.menu_name}}
+	<li>Number of Section: {{menu.total_number_of_sections}}</li>
+	<li>Number of Items: {{menu.total_number_of_items}}</li>
+	Sections currently in this menu:
+    </p>
+    {% if menu.total_number_of_sections == 0%}
+	<p>(No Sections have been added) </p>
+    {%else%}
+    {% for s in menu.getSections() %}
+	<li><a href="{{ url_for('editMenuSection',data=s.id) }}">{{s.section_name}}</a></li>
+    {%endfor%}
+    {%endif%}
+
+    <br>
+    <h4>Menu Properties</h4>
+  
+    <p>{{ form.menuName.label }}
+    {{ form.menuName }} <br>{{form.cnSubmit}}</p>
+
+    {%if menu.total_number_of_sections == 0 %}
+    {%else%}
+    <br>
+    <h4>Remove a Section</h4>
+    <p>{{ form.removeSection.label }}
+    {{form.removeSection}}<br>{{form.rmSecSubmit}}</p>
+    {%endif%}
+    
+    <br>
+    <h4>Add or Edit Sections</h4>
+
+    <p>{{form.sections.label}}
+    {{form.sections}} <br>{{form.addSectionSubmit}}</p>
+	
      
-    {{ form.menuName.label }}
-    {{ form.menuName }}
-     
-    {{ form.submit }}
+    <br>
+    <h4>Remove Menu </h4>
+    <p>
+    {{form.remove}}<br>
+    This cannot be undone<br>
+    WARNING: THIS WILL REMOVE THIS MENU</p>
 
   </form>
      

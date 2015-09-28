@@ -1,23 +1,47 @@
-from models import db, User,Menu
-from flask import g
+from models import db, User,Menu,MenuSection,MenuItem
+from flask import g,flash
 from flask.ext.wtf import Form
-from wtforms import SelectField , TextField, SubmitField, ValidationError, PasswordField , validators , IntegerField
+from wtforms import BooleanField, TextAreaField ,DecimalField, SelectField , TextField, SubmitField, ValidationError, PasswordField , validators , IntegerField
 
 
 """/////////////////////////////////////////////////////////
                     Menu Forms
 /////////////////////////////////////////////////////////"""
-class CreateMenuForm(Form):
-  #menuName = TextField("Menu Name", validators=[validators.Required("Please enter a Menu Name.")])
-  menuName = TextField("Menu Name",default='Menu1')
+class SelectMenuForm(Form):
+  menu = SelectField("Menu",coerce = int, validators = [validators.Required("Please choose a menu")])
+  submit = SubmitField("Select Menu")
+  def validate(self):
+    return Form.validate(self)
+
+class SelectSectionForm(Form):
+  publicSections = SelectField("Public Section",coerce=int)
+  privateSections = SelectField("Private Section",coerce=int)
+  pubsubmit = SubmitField("Select Section")
+  privsubmit = SubmitField("Select Section")
+  def validate(self):
+    return Form.validate(self)
+
+class SelectItemForm(Form):
+  item = SelectField("Item",coerce=int,validators=[validators.Required("Please choosa a valid item")])
+  submit = SubmitField("Select Item")
+  def validate(self):
+    return Form.validate(self)
+
+class AddorEditMenuForm(Form):
+  menuName = TextField("Menu Name", validators=[validators.Required("Please enter a Menu Name.")])
+  cnSubmit = SubmitField("Change Name")
+  removeSection = SelectField("Remove a section",coerce=int,default=0)
+  rmSecSubmit = SubmitField("Remove Section from Menu")
+  sections = SelectField("Add a Section",coerce=int,default=0)
+  addSectionSubmit = SubmitField("Add a Section to this Menu")
+  remove = SubmitField("Remove from Database")
   submit = SubmitField("Add to Database")
   
   def __init__(self,*args,**kwargs):
     Form.__init__(self,*args,**kwargs)
 
   def validate(self):
-    if not Form.validate(self):
-      print str(Form.validate(self)) + ' original form does not validate, menuName.data: ' + self.menuName.data
+    if not self.menuName.data:
       return False
 
     if Menu.query.filter_by(menu_name = self.menuName.data.lower()).first() is not None:
@@ -26,39 +50,65 @@ class CreateMenuForm(Form):
       return False
     return True
 
-class SelectMenuForm(Form):
-  menu = SelectField("Menu",coerce = int, choices=[(g.id,g.menu_name) for g in Menu.query.order_by('menu_name')]
-                       , validators = [validators.Required("Please choose a menu")])
-  def validate(self):
-    return Form.validate(self)
 
 
-class AddMenuSectionForm(Form):
-  menu = SelectField("Menu" , coerce = int,default=1)
+
+class AddorEditMenuSectionForm(Form):
   sectionName = TextField("Section Name" ,validators=[validators.Required("Please enter a Section Name")])
+  visibility = BooleanField("Publicly Visible",validators=[validators.Required("Please choose whether this section will be publically visible or not")])
+  s_s_o = SelectField("Staggered Service Order",coerce=int,
+                choices=[(0,"Not Applicable"),(1,"Before the Main Course"),(2,"With/As the Main Course"),(3,"After the Main Course")],
+                validators=[validators.Required("Please choose a Service Position")],
+                default = 0)
+  ppSubmit = SubmitField("Save Section Property Changes")
+  subsectionRemove = SelectField("SubSection",coerce=int,default=0)
+  ssRmSubmit = SubmitField("Remove Subsection from Section")
+  itemRemove = SelectField("Item",coerce=int,default=0)
+  itemRmSubmit = SubmitField("Remove Item form Section")
+  subsection = SelectField("SubSection",coerce=int,default=0)
+  sssubmit = SubmitField("Add SubSection to Section")
+  items = SelectField("Items",coerce=int,default=0)
+  itemsubmit = SubmitField("Add Item to Section")
   submit = SubmitField("Add to Database")
+  remove = SubmitField("Remove from Database")
   
   def __init__(self,*args,**kwargs):
     Form.__init__(self,*args,**kwargs)
 
   def validate(self):
-    return Form.validate(self)
+    if not self.sectionName.data:
+      return False
 
-class AddMenuItemForm(Form):
-  menu = SelectField("Menu", coerce = int,validators=[validators.Required("Please choose a menu")])
-  menusubmit = SubmitField("Select Menu")
-  section = SelectField("Section",  coerce = int,validators=[validators.Required("Please choose a section")])
+    if MenuSection.query.filter_by(section_name=self.sectionName.data.lower()).first() is not None:
+        self.sectionName.errors.append('Duplicated section name')
+        flash('duplicated name')
+        return False
+    return True
 
-  submit = SubmitField("Add to Database")
+class AddorEditMenuItemForm(Form):
+  item_id = TextField("Item id",validators=[validators.Required("Please choose an item id")])
+  item_name = TextField("Item Name", validators=[validators.Required("Please choose an item name")])
+  price = DecimalField("Item Price", places=2,validators=[validators.Required("Please input a price")])
+  short_description = TextAreaField("Item's Short Description")
+  long_description = TextAreaField("Item's Long Description")
+  availability = BooleanField("Currently Available?")
+  ingrediants = TextAreaField("A list of ingrediants of this product")
+  allergens = TextAreaField("A list of possible allergens in this product")
+  ppItemSubmit = SubmitField("Change Properties")
+
+  submit = SubmitField("Save Changes")
+  
+  remove = SubmitField("Remove this Item")
  
   def __init__(self,*args,**kwargs):
     Form.__init__(self,*args,**kwargs)
 
-  def validate(self):
+  def validate(self): 
     if not Form.validate(self):
-      return False
+      if MenuItem.query.filter_by(item_name=self.item_name.data.lower()).first() is not None or MenuItem.query.filter_by(item_id=self.item_id.data).first() is not None:
+        flash('Duplicated name or Id, pelase change')
+        return False
     return True
-
 
  
 

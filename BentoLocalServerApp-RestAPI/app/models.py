@@ -257,8 +257,7 @@ class MenuSection(db.Model):
         total_combinations = 1
         for subsection in self.subsections.all():
           num = subsection.get_total_number_of_items()
-          if num != 0:
-            total_combinations *= num
+          total_combinations *= num
         self.total_number_of_items = total_combinations
         return
       if self.section_items.count() >= 0:
@@ -267,6 +266,9 @@ class MenuSection(db.Model):
 
     def get_total_number_of_items(self):
       return self.total_number_of_items
+
+    def has_parents(self):
+      return len(self.parentSection) != 0
 
     def __repr__(self):
       return '< MenuSection: %r , Number_of_groups: %r ,  Number_of_items: %r >' % (self.section_name,self.number_of_groups,self.total_number_of_items)

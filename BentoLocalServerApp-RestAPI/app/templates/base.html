@@ -1,5 +1,6 @@
 <html>
   <head>
+    <link rel="stylsheet" type="test/css" href="style.css"/>
     {% if title %}
     <title>{{ title }} - Bento Server</title>
     {% else %}
@@ -8,24 +9,28 @@
   </head>
   <body>
 
-    <header>
-      <div>
-        <h1>Bento Server</h1>
-        <nav>
-          <ul>
-          <li><a href="{{ url_for('index') }}">Home</a></li>
-          {% if g.user.is_authenticated() %}
-          <li><a href="{{ url_for('profile') }}">Profile</a></li>
-          <li><a href="{{ url_for('signout') }}">Sign Out</a></li>
-          {% else %}
-          <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
-          <li><a href="{{ url_for('login') }}">Sign In</a></li>
-           {% endif %}
-          </ul>
-        </nav>
-      </div>
-    </header>
 
+      <div id ="header">
+        <div id = "headcontent">
+  	  <div id="title">
+            <h1>Bento Server</h1>
+          </div>
+          <div id ="topmenu">
+            <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            {% if g.user.is_authenticated() %}
+            <li><a href="{{ url_for('profile') }}">Profile</a></li>
+            <li><a href="{{ url_for('signout') }}">Sign Out</a></li>
+            {% else %}
+            <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+            <li><a href="{{ url_for('login') }}">Sign In</a></li>
+            {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    <div id ="container">
     <hr>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -37,9 +42,11 @@
     {% endif %}
     {% endwith %}
 
-    <div>
+    <div id ="content">
       {% block content %}
       {% endblock %}
     </div>
+    <div>
   </body>
+
 </html>

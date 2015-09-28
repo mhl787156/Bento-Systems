@@ -1,14 +1,14 @@
-<!-- extend base layout -->
-{% extends "base.html" %}
+<!-- extend menubase layout -->
+{% extends "menubase.html" %}
  
-{% block content %}
+{% block menucontent %}
   <h2>Select Menu</h2>
  
   {% for message in form.menu.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
 
-  <form action="{{ url_for('selectMenu') }}" method=post>
+  <form action="{{ url_for('selectMenu',url=url) }}" method=post>
     
     <p>{{form.menu.label}}
     {{form.menu}}</p>
