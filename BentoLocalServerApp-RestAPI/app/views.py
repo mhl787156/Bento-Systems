@@ -93,7 +93,7 @@ def editMenu(data=None):
       db.session.commit()
       flash("Menu '{}' has been removed".format(menu.menu_name))
       return redirect(url_for('index'))
-    
+   
     if form.cnSubmit.data and form.menuName.data:
       oname = menu.menu_name
       menu.updateMenu(menu_name = form.menuName.data)
@@ -107,7 +107,7 @@ def editMenu(data=None):
         db.session.commit()
         flash("Section {} removed from {}".format(sec.section_name,menu.menu_name))
       else:
-        flash("Section {} does not exist in this menu".format(sec.section_name))
+        flash("Section does not exist in this menu".format(sec.section_name))
 
     if form.addSectionSubmit.data and form.sections.data:
       sec = MenuSection.query.get(form.sections.data)
@@ -169,8 +169,8 @@ def editMenuSection(data=None):
     if form.remove.data:
       for item in section.getItems():
         section.deleteItem(item)
-      for section in section.getSubSections():
-        section.deleteSubSection(section)
+      for s in section.getSubSections():
+        section.deleteSubSection(s)
       db.session.delete(section)
       db.session.commit()
       flash("Section '{}' has been removed".format(section.section_name))
@@ -229,12 +229,11 @@ def editMenuSection(data=None):
   return render_template('editMenuSection.html',title='Edit a Section',form=form,section=section)
 
 
-@app.route('/addMenuItem/',methods=['GET','POST'])
+@app.route('/addMenuItem',methods=['GET','POST'])
 @login_required
 def addMenuItem():
   form = AddorEditMenuItemForm()
   if request.method == 'POST':
-    
     if form.validate()==False:
       return render_template('addNewMenuItem.html', title='Add New Menu Item',form=form)
 

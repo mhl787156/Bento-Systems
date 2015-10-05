@@ -104,11 +104,12 @@ class AddorEditMenuItemForm(Form):
     Form.__init__(self,*args,**kwargs)
 
   def validate(self): 
-    if not Form.validate(self):
+    if Form.validate(self):
       if MenuItem.query.filter_by(item_name=self.item_name.data.lower()).first() is not None or MenuItem.query.filter_by(item_id=self.item_id.data).first() is not None:
-        flash('Duplicated name or Id, pelase change')
+        flash('Duplicated name or Id, please change')
         return False
-    return True
+      return True
+    return False
 
  
 
