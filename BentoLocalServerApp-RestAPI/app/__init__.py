@@ -25,4 +25,4 @@ lm.login_view = 'login'
 
 auth = HTTPBasicAuth()
 
-from app import views, models, routes, database
+from app import views, models, database

@@ -3,6 +3,16 @@ from datetime import datetime
 from werkzeug import generate_password_hash, check_password_hash
 from random import randint
 
+
+
+
+
+def dump_datetime(value):
+    """Deserialize datetime object into string form for JSON processing."""
+    if value is None:
+      return None
+    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+
 """//////////////////////////////////////////////////////////////
                         EMPLOYEE DATABASE ITEMS
 /////////////////////////////////////////////////////////////"""
@@ -55,6 +65,17 @@ class User(db.Model):
             return unicode(self.id)  # python 2
         except NameError:
             return str(self.id)  # python 3
+          
+    def serialize(self):
+      return {
+          'id' : self.id,
+          'employee_id' : self.employee_id,
+          'firstname' : self.firstname,
+          'lastname' : self.lastname,
+          'mobile_number' : self.mobile_number,
+          'date_joined' : dump_datetime(self.date_joined),
+          'email' : self.email
+        }
 
     def __repr__(self):
       return '< User: %r Password: %r >' % (self.employee_id,self.password)
@@ -111,6 +132,16 @@ class Menu(db.Model):
     
     def __init__(self,menu_name):
       self.updateMenu(menu_name)
+
+    def serialize(self):
+      return {
+          'id' : self.id,
+          'menu_name' : self.menu_name,
+          'last_date_changed' : dump_datetime(self.last_date_changed),
+          'total_number_of_sections' : self.total_number_of_sections,
+          'total_number_of_items' : self.total_number_of_items,
+          'menu_sections' : [item.short_serialize() for item in self.menu_sections]
+          }
 
     def updateMenu(self,menu_name=None):
       if menu_name is not None:
@@ -200,6 +231,40 @@ class MenuSection(db.Model):
       self.updateMenuSection(section_name)
       self.visibility = visibility
       self.staggered_service_order = staggered_service_order
+
+    def serialize(self):
+      return {
+            'id' : self.id,
+            'section_name' : self.section_name,
+            'number_of_groups' : self.number_of_groups,
+            'total_number_of_items' : self.total_number_of_items,
+            'visibility' : self.visibility,
+            'staggered_service_order' : self.staggered_service_order,
+            'section_items' : [item.serialize() for item in self.section_items],
+            'subsections' : [s.serialize() for s in self.subsections],
+            'menus_belonged_to' : [s.id for s in self.menu],
+            'parent_sections' : [s.id for s in self.parentSection]
+          }
+
+    def short_serialize(self):
+      if self.number_of_groups > 0:
+        return {
+            'id' : self.id,
+            'section_name' : self.section_name,
+            'number_of_groups' : self.number_of_groups,
+            'total_number_of_items' : self.total_number_of_items,
+            'subsections' : [s.short_serialize() for s in self.subsections],
+          }
+      
+      return {
+            'id' : self.id,
+            'section_name' : self.section_name,
+            'number_of_groups' : self.number_of_groups,
+            'total_number_of_items' : self.total_number_of_items,
+            'section_items' : [item.short_serialize() for item in self.section_items],
+          }
+
+
 
     def updateMenuSection(self,name=None):
       if name is not None:
@@ -292,6 +357,29 @@ class MenuItem(db.Model):
     
     def __init__(self,item_id,item_name,price,sd,ld,a,i,al):
       self.updateItem(item_id,item_name,price,sd,ld,a,i,al)
+
+    def serialize(self):
+      return {
+            'id' : self.id,
+            'item_id' : self.item_id,
+            'item_name' : self.item_name,
+            'price' : str(self.price),
+            'short_description' : self.short_description,
+            'long_description' : self.long_description,
+            'availability' : self.availability,
+            'ingrediants' : self.ingrediants,
+            'allergens' : self.allergens,
+            'parent_section' : [s.id for s in self.section]
+          }
+    
+    def short_serialize(self):
+      return {
+            'id' : self.id,
+            'item_id' : self.item_id,
+            'item_name' : self.item_name,
+            'price' : str(self.price),
+          }
+
 
     def updateItem(self,item_id,item_name,price,sd,ld,a,i,al):
       self.set_item_id(item_id)

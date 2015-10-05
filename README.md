@@ -54,28 +54,12 @@ c) start server with ./run.py
         -
                     .
                     .
-                    .
-                    
+
       -forms.py
           # A list of Form implementations for the local server
-          +CreateMenuForm
-          +SelectMenuForm
-          +AddMenuSectionForm
-          +AddMenuItemForm
-          +SignupForm
-          +editProfile
-          +SigninForm
 
       -models.py
           # A list of Database Tables
-          +User
-          +Device
-          +Menu
-          +MenuSection
-          +MenuItem
-          +OrderCounter
-          +OrderLogger
-          +OrderItem
 
       -views.py
           # A list/implementation of the routes the local server app to take
@@ -97,7 +81,7 @@ c) start server with ./run.py
     -unitTests.py     # Unit Tests
     -xmlunitTests.py  # Unit Tests with XML output
     
-    (-db_*.py)
+    (-db_*.py)        # DataBase Initialisation and Control
     -requirements.txt
     -setup.sh
 

@@ -1,11 +1,24 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
-from app import app, db, lm
+from app import app, db, lm, api
 from .forms import SelectItemForm,SelectSectionForm,SelectMenuForm,SignupForm,SigninForm,AddorEditMenuForm,AddorEditMenuSectionForm,AddorEditMenuItemForm
 from .models import User,Menu,MenuSection,MenuItem
 
+"""--------------- RESTFUL Routes ---------------------------------"""
+from resources.order import OrderAPI
+from resources.menu import MenuAPI,MenuItemAPI,MenuSectionAPI
 
-"""---------------  MENU METHODS -----------------------------------"""
+
+api.add_resource(MenuAPI,'/api/menu/<int:data>')
+api.add_resource(MenuItemAPI,'/api/menuitem/<int:data>')
+api.add_resource(MenuSectionAPI,'/api/menusection/<int:data>')
+
+api.add_resource(OrderAPI,'/api/order/<int:data>')
+
+
+
+
+"""--------------- MENU METHODS -----------------------------------"""
 """helpers"""
 @app.route('/<path:url>/selectMenu/',methods=['GET','POST'])
 @login_required
