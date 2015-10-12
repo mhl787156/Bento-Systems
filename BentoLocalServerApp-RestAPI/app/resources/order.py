@@ -19,13 +19,30 @@ order_field = {
 class OrderAPI(Resource):
   #decorators = [auth.login_required]
   def get(self,data=None):
+    #returns order number 'data'
     return { 'hello' : 'world' +str(data)}
 
-  def put(self,data):
+  def post(self,data):
+    #edits a current order into the system
     return "put {} in db".format(data)
 
   def delete(self,data):
+    # 'deletes' current order
     return
 
-  def post(self,data):
+class NewOrderAPI(Resource):
+  #decorators = [auth.login_requried]
+  def get(self):
+    return 
+  def post(self):
     return
+
+class OrderEditAPI
+  #decorators = [auth.login_requried]
+  def get(self):
+    return 
+  def post(self):
+    return
+  def delete(self):
+    return
+

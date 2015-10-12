@@ -5,7 +5,7 @@ from .forms import SelectItemForm,SelectSectionForm,SelectMenuForm,SignupForm,Si
 from .models import User,Menu,MenuSection,MenuItem
 
 """--------------- RESTFUL Routes ---------------------------------"""
-from resources.order import OrderAPI
+from resources.order import OrderAPI, NewOrderAPI, OrderEditAPI
 from resources.menu import MenuAPI,MenuItemAPI,MenuSectionAPI
 
 
@@ -13,7 +13,9 @@ api.add_resource(MenuAPI,'/api/menu/<int:data>')
 api.add_resource(MenuItemAPI,'/api/menuitem/<int:data>')
 api.add_resource(MenuSectionAPI,'/api/menusection/<int:data>')
 
+api.add_resource(NewOrderAPI,'/api/order/new_order')
 api.add_resource(OrderAPI,'/api/order/<int:data>')
+api.add_resource(OrderEditAPI,'/api/order/<int:data>/AddOrderItem')
 
 
 
