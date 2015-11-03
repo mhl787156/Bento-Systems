@@ -6,9 +6,9 @@ from .models import User,Menu,MenuSection,MenuItem
 
 """--------------- RESTFUL Routes ---------------------------------"""
 from resources.order import OrderAPI, NewOrderAPI, OrderEditAPI
-from resources.menu import MenuAPI,MenuItemAPI,MenuSectionAPI
+from resources.menu import MenuAPI,MenuItemAPI,MenuSectionAPI,GetMenuAPI
 
-
+api.add_resource(GetMenuAPI,'/api/menu')
 api.add_resource(MenuAPI,'/api/menu/<int:data>')
 api.add_resource(MenuItemAPI,'/api/menuitem/<int:data>')
 api.add_resource(MenuSectionAPI,'/api/menusection/<int:data>')

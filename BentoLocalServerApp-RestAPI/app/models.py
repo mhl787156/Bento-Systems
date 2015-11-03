@@ -143,6 +143,12 @@ class Menu(db.Model):
           'menu_sections' : [item.short_serialize() for item in self.menu_sections]
           }
 
+    def short_serialize(self):
+      return {
+          'id' : self.id,
+          'menu_name' : self.menu_name,
+      }
+
     def updateMenu(self,menu_name=None):
       if menu_name is not None:
         self.menu_name = menu_name.lower()

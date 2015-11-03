@@ -37,7 +37,7 @@ class NewOrderAPI(Resource):
   def post(self):
     return
 
-class OrderEditAPI
+class OrderEditAPI(Resource):
   #decorators = [auth.login_requried]
   def get(self):
     return 
