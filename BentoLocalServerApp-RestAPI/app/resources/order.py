@@ -37,7 +37,7 @@ class OrderAPI(Resource):
     order = Order.query.get(data)
     db.session.delete(order)
     db.session.commit()
-    return { "removed_order" order.serialize() }
+    return { "removed_order" : order.serialize() }
 
 class NewOrderAPI(Resource):
   #decorators = [auth.login_requried]
