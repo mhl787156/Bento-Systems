@@ -27,9 +27,10 @@ new_order_fields = {
 class OrderAPI(Resource):
   #decorators = [auth.login_required]
 
-  def get(self,data=None):
+  def get(self,data):
     #returns order number 'data'
-    return { 'hello' : 'world' +str(data)}
+    order = Order.query.get(data)
+    return { "order": order.serialize() }
 
   def delete(self,data):
     # 'deletes' current order

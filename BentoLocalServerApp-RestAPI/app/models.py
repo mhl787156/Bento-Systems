@@ -499,11 +499,10 @@ class Order(db.Model):
             'table_number' : self.table_number,
             'number_of_customers' : self.number_of_customers,
             'number_of_customers' : self.number_of_customers,
-            'total_price' : self.total_price,
+            'total_price' : str(self.total_price),
             'currently_active' : self.currently_active,
             'paid' : self.paid,
-            'time_arrived' : self.time_arrived,
-            'time_elapsed' : self.time_elapsed
+            'time_arrived' : dump_datetime(self.time_arrived),
           }
 
     def updateOrder(self,table_number=None,number_of_customers=None,staggered_service=None):
