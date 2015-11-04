@@ -87,7 +87,7 @@ class DBTestCases(test_set_up.AbstractTestCases):
   def test_orderInit(self):
     t_n = 2
     num_c = 4
-    o = Order(t_n,num_c)
+    o = Order(t_n,num_c,0)
     db.session.add(o)
     db.session.commit()
     o = Order.query.first()
@@ -139,7 +139,7 @@ class DBTestCases(test_set_up.AbstractTestCases):
 
     t_n = 2
     n_p = 4
-    o = Order(t_n,n_p)
+    o = Order(t_n,n_p,0)
     db.session.add(o)
 
     oi1 = OrderItem(mi1,1)
@@ -209,11 +209,11 @@ class DBTestCases(test_set_up.AbstractTestCases):
     db.session.commit()
     oc = OrderCounter.query.first()
     
-    o1 = Order(4,4)
+    o1 = Order(4,4,0)
     o1.total_price = 10.50
-    o2 = Order(2,2)
+    o2 = Order(2,2,0)
     o2.total_price = 20.50
-    o3 = Order(3,3)
+    o3 = Order(3,3,0)
     o3.total_price = 15.75
 
     total = o1.total_price + o2.total_price + o3.total_price

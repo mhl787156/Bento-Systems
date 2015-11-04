@@ -482,14 +482,29 @@ class Order(db.Model):
     order_counter = db.Column(db.Integer,db.ForeignKey('ordercounter.id'))
 
 
-    def __init__(self,table_number,number_of_customers):
-      self.updateOrder(table_number=table_number,number_of_customers=number_of_customers)
+    def __init__(self,table_number,number_of_customers,s_s_o):
+      self.updateOrder(table_number=table_number,
+                       number_of_customers=number_of_customers,
+                       staggered_service=s_s_o)
       self.time_arrived = datetime.now()
       self.staggered_service = False
       self.currently_active = True
       self.paid = False
       if self.order_counter != None:
         self.daysorders.updateCounter()
+
+    def serialize(self):
+      return {
+            'id' : self.id,
+            'table_number' : self.table_number,
+            'number_of_customers' : self.number_of_customers,
+            'number_of_customers' : self.number_of_customers,
+            'total_price' : self.total_price,
+            'currently_active' : self.currently_active,
+            'paid' : self.paid,
+            'time_arrived' : self.time_arrived,
+            'time_elapsed' : self.time_elapsed
+          }
 
     def updateOrder(self,table_number=None,number_of_customers=None,staggered_service=None):
       if staggered_service is not None:

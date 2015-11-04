@@ -8,14 +8,19 @@ from .models import User,Menu,MenuSection,MenuItem
 from resources.order import OrderAPI, NewOrderAPI, OrderEditAPI
 from resources.menu import MenuAPI,MenuItemAPI,MenuSectionAPI,GetMenuAPI
 
-api.add_resource(GetMenuAPI,'/api/menu')
-api.add_resource(MenuAPI,'/api/menu/<int:data>')
-api.add_resource(MenuItemAPI,'/api/menuitem/<int:data>')
-api.add_resource(MenuSectionAPI,'/api/menusection/<int:data>')
+api.add_resource(GetMenuAPI,'/api/menu', endpoint = 'getmenu')
+api.add_resource(MenuAPI,'/api/menu/<int:data>', endpoint = 'menu')
+api.add_resource(MenuItemAPI,'/api/menuitem/<int:data>', endpoint = 'menuitem')
+api.add_resource(MenuSectionAPI,'/api/menusection/<int:data>', endpoint = 'menusection')
 
-api.add_resource(NewOrderAPI,'/api/order/new_order')
-api.add_resource(OrderAPI,'/api/order/<int:data>')
-api.add_resource(OrderEditAPI,'/api/order/<int:data>/AddOrderItem')
+#Generate a new Order
+api.add_resource(NewOrderAPI,'/api/order/new_order', endpoint = 'neworder')
+
+#Get or Delete an Order
+api.add_resource(OrderAPI,'/api/order/<int:data>', endpoint = 'order')
+
+#Add or Delete an item in the Order
+api.add_resource(OrderEditAPI,'/api/order/<int:orderID>/AddOrderItem/<int:data>', endpoint = 'editorder')
 
 
 
